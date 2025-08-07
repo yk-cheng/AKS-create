@@ -1,0 +1,59 @@
+# Production Environment Variables
+# Copy this file to terraform.tfvars and update values
+
+# Basic Configuration
+cluster_name        = "aks-prod-cluster"
+location           = "East Asia"
+resource_group_name = "rg-aks-prod"
+dns_prefix         = "aks-prod"
+kubernetes_version = "1.27.7"
+environment        = "prod"
+
+# System Node Pool Configuration
+system_node_count     = 3
+system_node_vm_size   = "Standard_D4s_v3"
+system_node_min_count = 3
+system_node_max_count = 9
+
+# User Node Pool Configuration (for 53 applications)
+user_node_count     = 10
+user_node_vm_size   = "Standard_D8s_v3"
+user_node_min_count = 10
+user_node_max_count = 30
+
+# High Availability Zones
+availability_zones = ["1", "2", "3"]
+
+# Network Configuration
+subnet_id          = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-network-prod/providers/Microsoft.Network/virtualNetworks/vnet-prod/subnets/subnet-aks"
+vnet_id           = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-network-prod/providers/Microsoft.Network/virtualNetworks/vnet-prod"
+dns_service_ip    = "10.1.0.10"
+docker_bridge_cidr = "172.17.0.1/16"
+service_cidr      = "10.1.0.0/24"
+
+# ACR Integration
+acr_id = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-acr-prod/providers/Microsoft.ContainerRegistry/registries/acrprod"
+
+# Application Gateway Integration
+enable_application_gateway = true
+application_gateway_id     = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-network-prod/providers/Microsoft.Network/applicationGateways/agw-prod"
+
+# Monitoring
+enable_log_analytics         = true
+log_analytics_workspace_id   = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-monitoring-prod/providers/Microsoft.OperationalInsights/workspaces/law-prod"
+
+# Azure AD Integration
+admin_group_object_ids = [
+  "12345678-1234-1234-1234-123456789012",  # Replace with your Azure AD admin group Object ID
+  "87654321-4321-4321-4321-210987654321"   # Additional admin group if needed
+]
+
+# Tags
+tags = {
+  Environment = "prod"
+  Project     = "AKS-Migration"
+  Owner       = "DevOps-Team"
+  CostCenter  = "IT"
+  Backup      = "Required"
+  Monitoring  = "Critical"
+}

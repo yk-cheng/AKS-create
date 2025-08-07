@@ -1,0 +1,53 @@
+# Development Environment Variables
+# Copy this file to terraform.tfvars and update values
+
+# Basic Configuration
+cluster_name        = "aks-dev-cluster"
+location           = "East Asia"
+resource_group_name = "rg-aks-dev"
+dns_prefix         = "aks-dev"
+kubernetes_version = "1.27.7"
+environment        = "dev"
+
+# System Node Pool Configuration
+system_node_count     = 1
+system_node_vm_size   = "Standard_D2s_v3"
+system_node_min_count = 1
+system_node_max_count = 3
+
+# User Node Pool Configuration  
+user_node_count     = 2
+user_node_vm_size   = "Standard_D2s_v3"
+user_node_min_count = 1
+user_node_max_count = 10
+
+# Network Configuration
+subnet_id          = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-network-dev/providers/Microsoft.Network/virtualNetworks/vnet-dev/subnets/subnet-aks"
+vnet_id           = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-network-dev/providers/Microsoft.Network/virtualNetworks/vnet-dev"
+dns_service_ip    = "10.2.0.10"
+docker_bridge_cidr = "172.17.0.1/16"
+service_cidr      = "10.2.0.0/24"
+
+# ACR Integration (optional)
+acr_id = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-acr-dev/providers/Microsoft.ContainerRegistry/registries/acrdev"
+
+# Application Gateway Integration
+enable_application_gateway = false
+application_gateway_id     = ""
+
+# Monitoring
+enable_log_analytics         = true
+log_analytics_workspace_id   = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-monitoring-dev/providers/Microsoft.OperationalInsights/workspaces/law-dev"
+
+# Azure AD Integration
+admin_group_object_ids = [
+  "12345678-1234-1234-1234-123456789012"  # Replace with your Azure AD group Object ID
+]
+
+# Tags
+tags = {
+  Environment = "dev"
+  Project     = "AKS-Migration"
+  Owner       = "DevOps-Team"
+  CostCenter  = "IT"
+}

@@ -1,0 +1,53 @@
+# Staging Environment Variables
+# Copy this file to terraform.tfvars and update values
+
+# Basic Configuration
+cluster_name        = "aks-staging-cluster"
+location           = "East Asia"
+resource_group_name = "rg-aks-staging"
+dns_prefix         = "aks-staging"
+kubernetes_version = "1.27.7"
+environment        = "staging"
+
+# System Node Pool Configuration
+system_node_count     = 3
+system_node_vm_size   = "Standard_D4s_v3"
+system_node_min_count = 3
+system_node_max_count = 6
+
+# User Node Pool Configuration
+user_node_count     = 3
+user_node_vm_size   = "Standard_D4s_v3"
+user_node_min_count = 3
+user_node_max_count = 15
+
+# Network Configuration
+subnet_id          = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-network-staging/providers/Microsoft.Network/virtualNetworks/vnet-staging/subnets/subnet-aks"
+vnet_id           = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-network-staging/providers/Microsoft.Network/virtualNetworks/vnet-staging"
+dns_service_ip    = "10.3.0.10"
+docker_bridge_cidr = "172.17.0.1/16"
+service_cidr      = "10.3.0.0/24"
+
+# ACR Integration
+acr_id = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-acr-staging/providers/Microsoft.ContainerRegistry/registries/acrstaging"
+
+# Application Gateway Integration
+enable_application_gateway = true
+application_gateway_id     = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-network-staging/providers/Microsoft.Network/applicationGateways/agw-staging"
+
+# Monitoring
+enable_log_analytics         = true
+log_analytics_workspace_id   = "/subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-monitoring-staging/providers/Microsoft.OperationalInsights/workspaces/law-staging"
+
+# Azure AD Integration
+admin_group_object_ids = [
+  "12345678-1234-1234-1234-123456789012"  # Replace with your Azure AD group Object ID
+]
+
+# Tags
+tags = {
+  Environment = "staging"
+  Project     = "AKS-Migration"
+  Owner       = "DevOps-Team"
+  CostCenter  = "IT"
+}

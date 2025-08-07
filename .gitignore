@@ -1,0 +1,75 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform/
+.terraform.lock.hcl
+terraform.tfplan
+terraform.tfplan.*
+
+# Azure
+.azure/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.bak
+
+# Azure DevOps
+.vs/
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+
+# Docker
+.dockerignore
+
+# Node modules (if any)
+node_modules/
+
+# Python (if any)
+__pycache__/
+*.pyc
+*.pyo
+
+# Sensitive data
+secrets/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Don't ignore example files
+!terraform.tfvars.example
+!kubeconfig.example
+!.env.example
+
+# Additional Terraform patterns
+**/.terraform/
+**/crash.log
+**/crash.*.log
+
+# Additional temporary patterns
+temp/
+*.backup
+*.old

@@ -17,7 +17,7 @@ variables:
   k8sNamespace: 'py-flask-app'
   
   # Build Agent
-  vmImageName: 'ubuntu-latest'
+  poolName: 'Kai-mac-host'
 
 stages:
 - stage: Build
@@ -26,7 +26,7 @@ stages:
   - job: Build
     displayName: 'Build Docker Image'
     pool:
-      vmImage: $(vmImageName)
+      name: $(poolName)
     steps:
     - task: Docker@2
       displayName: 'Build Docker Image'
@@ -56,7 +56,7 @@ stages:
   - deployment: Deploy
     displayName: 'Deploy to AKS'
     pool:
-      vmImage: $(vmImageName)
+      name: $(poolName)
     environment: 'aks-dev-environment'
     strategy:
       runOnce:

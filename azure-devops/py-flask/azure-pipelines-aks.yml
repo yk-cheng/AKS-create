@@ -1,0 +1,108 @@
+# Azure DevOps Pipeline for Flask Application to AKS
+# Build Docker image, push to ACR, and deploy to AKS
+
+trigger:
+- main
+
+variables:
+  # Container Registry 設定
+  containerRegistry: 'acrdev9vgrsdq8.azurecr.io'
+  imageRepository: 'py-flask'
+  dockerfilePath: '$(Build.SourcesDirectory)/azure-devops/py-flask/Dockerfile'
+  tag: '$(Build.BuildId)'
+  
+  # AKS 設定
+  resourceGroupName: 'rg-aks-dev'
+  aksClusterName: 'aks-dev-cluster'
+  k8sNamespace: 'py-flask-app'
+  
+  # Build Agent
+  vmImageName: 'ubuntu-latest'
+
+stages:
+- stage: Build
+  displayName: 'Build and Push Docker Image'
+  jobs:
+  - job: Build
+    displayName: 'Build Docker Image'
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: 'Build Docker Image'
+      inputs:
+        command: 'build'
+        repository: '$(imageRepository)'
+        dockerfile: '$(dockerfilePath)'
+        buildContext: '$(Build.SourcesDirectory)/azure-devops/py-flask'
+        tags: |
+          $(tag)
+          latest
+
+    - task: Docker@2
+      displayName: 'Push to Azure Container Registry'
+      inputs:
+        command: 'push'
+        repository: '$(imageRepository)'
+        containerRegistry: 'acrdev9vgrsdq8'
+        tags: |
+          $(tag)
+          latest
+
+- stage: Deploy
+  displayName: 'Deploy to AKS'
+  dependsOn: Build
+  jobs:
+  - deployment: Deploy
+    displayName: 'Deploy to AKS'
+    pool:
+      vmImage: $(vmImageName)
+    environment: 'aks-dev-environment'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          
+          - task: KubernetesManifest@0
+            displayName: 'Create/Update Namespace'
+            inputs:
+              action: 'deploy'
+              kubernetesServiceConnection: 'aks-dev-connection'
+              namespace: '$(k8sNamespace)'
+              manifests: '$(Build.SourcesDirectory)/azure-devops/py-flask/k8s-manifests/namespace.yaml'
+
+          - task: KubernetesManifest@0
+            displayName: 'Deploy Application'
+            inputs:
+              action: 'deploy'
+              kubernetesServiceConnection: 'aks-dev-connection'
+              namespace: '$(k8sNamespace)'
+              manifests: |
+                $(Build.SourcesDirectory)/azure-devops/py-flask/k8s-manifests/deployment.yaml
+                $(Build.SourcesDirectory)/azure-devops/py-flask/k8s-manifests/service.yaml
+                $(Build.SourcesDirectory)/azure-devops/py-flask/k8s-manifests/ingress.yaml
+              containers: '$(containerRegistry)/$(imageRepository):$(tag)'
+
+          - task: Kubernetes@1
+            displayName: 'Get Service Status'
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceEndpoint: 'aks-dev-connection'
+              namespace: '$(k8sNamespace)'
+              command: 'get'
+              arguments: 'pods,svc,ingress'
+              outputFormat: 'wide'
+
+# Pull Request 觸發設定
+pr:
+- main
+
+# 排程建置 (可選)
+schedules:
+- cron: "0 2 * * *"  # 每天凌晨 2 點建置
+  displayName: Daily build
+  branches:
+    include:
+    - main
+  always: false

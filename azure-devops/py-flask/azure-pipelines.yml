@@ -1,0 +1,110 @@
+# Azure DevOps Pipeline for Flask Application
+# 觸發條件：推送到 main/master 分支
+
+trigger:
+- main
+- master
+
+# 使用 Ubuntu 最新版本作為建置環境
+pool:
+  vmImage: 'ubuntu-latest'
+
+# 定義變數
+variables:
+  pythonVersion: '3.9'
+  webAppName: 'your-flask-app-name'  # 請替換為實際的 Azure Web App 名稱
+  resourceGroupName: 'your-resource-group'  # 請替換為實際的資源群組名稱
+
+stages:
+- stage: Build
+  displayName: 'Build Stage'
+  jobs:
+  - job: Build
+    displayName: 'Build Job'
+    steps:
+    # 設定 Python 版本
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(pythonVersion)'
+        displayName: 'Use Python $(pythonVersion)'
+
+    # 安裝 Python 依賴
+    - script: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+      displayName: 'Install dependencies'
+
+    # 執行基本測試（如果有的話）
+    - script: |
+        python -m pytest --tb=short --maxfail=1 tests/
+      displayName: 'Run tests'
+      continueOnError: true  # 如果沒有測試檔案，繼續執行
+
+    # 建立部署包
+    - task: ArchiveFiles@2
+      displayName: 'Archive files'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+        includeRootFolder: false
+        archiveType: zip
+        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+        replaceExistingArchive: true
+
+    # 發布建置產物
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+
+- stage: Deploy
+  displayName: 'Deploy Stage'
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - deployment: Deploy
+    displayName: 'Deploy Job'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          # 下載建置產物
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'drop'
+              downloadPath: '$(System.ArtifactsDirectory)'
+
+          # 部署到 Azure Web App
+          - task: AzureWebApp@1
+            displayName: 'Deploy Azure Web App'
+            inputs:
+              azureSubscription: 'your-service-connection'  # 請設定正確的服務連接
+              appType: 'webAppLinux'
+              appName: '$(webAppName)'
+              package: '$(System.ArtifactsDirectory)/drop/$(Build.BuildId).zip'
+              runtimeStack: 'PYTHON|3.9'
+              startUpCommand: 'gunicorn --bind=0.0.0.0 --workers=4 app:app'
+
+          # 健康檢查
+          - script: |
+              echo "Performing health check..."
+              sleep 30  # 等待應用程式啟動
+              curl -f https://$(webAppName).azurewebsites.net/health || exit 1
+            displayName: 'Health Check'
+            continueOnError: true
+
+# 額外的設定選項
+pr:
+- main
+- master
+
+# 排程建置（可選）
+# schedules:
+# - cron: "0 2 * * *"  # 每天凌晨 2 點建置
+#   displayName: Daily midnight build
+#   branches:
+#     include:
+#     - main

@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: py-flask-ingress
+  namespace: py-flask-app
+  labels:
+    app: py-flask-app
+  annotations:
+    # 使用 Azure CNI 的預設 Ingress Controller (nginx)
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # SSL 相關設定 (可選)
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  rules:
+  - host: py-flask.local  # 本地測試用，生產環境請更換為實際域名
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: py-flask-service
+            port:
+              number: 80
+  # SSL 憑證設定 (可選)
+  # tls:
+  # - hosts:
+  #   - py-flask.local
+  #   secretName: py-flask-tls

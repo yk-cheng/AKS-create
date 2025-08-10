@@ -1,0 +1,36 @@
+{
+  "name": "aks-5-devops",
+  "type": "kubernetes",
+  "url": "https://aks-dev-p8evm4on.hcp.eastasia.azmk8s.io",
+  "authorization": {
+    "scheme": "Kubernetes",
+    "parameters": {
+      "azureEnvironment": "AzureCloud",
+      "azureTenantId": "10f0f3b2-c2b5-445f-84f7-584515916a82",
+      "roleBindingName": "azdev-rb-azdev-sa-b47745-admin-on-default",
+      "secretName": "azdev-sa-b47745-secret",
+      "serviceAccountName": "azdev-sa-b47745"
+    }
+  },
+  "data": {
+    "authorizationType": "AzureSubscription",
+    "azureSubscriptionId": "7f004e94-ef6d-49df-8f43-ac31ddf854fd",
+    "azureSubscriptionName": "Visual Studio Enterprise 訂閱 – MPN",
+    "clusterAdmin": "true",
+    "clusterId": "/subscriptions/7f004e94-ef6d-49df-8f43-ac31ddf854fd/resourcegroups/rg-aks-dev/providers/Microsoft.ContainerService/managedClusters/aks-dev-cluster",
+    "namespace": "default"
+  },
+  "isShared": false,
+  "isReady": true,
+  "serviceEndpointProjectReferences": [
+    {
+      "projectReference": {
+        "id": "5c70574c-e790-401e-894d-6aef57901848",
+        "name": "py-flask"
+      },
+      "name": "aks-5-devops",
+      "description": ""
+    }
+  ]
+}
+

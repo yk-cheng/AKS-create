@@ -40,13 +40,14 @@ stages:
       name: $(poolName)
     steps:
     - task: Docker@2
-      displayName: 'Build Docker Image'
+      displayName: 'Build Multi-platform Docker Image (AMD64)'
       inputs:
         command: 'build'
         repository: '$(imageRepository)'
         containerRegistry: 'acrdev9vgrsdq8'
         dockerfile: '$(dockerfilePath)'
         buildContext: '$(Build.SourcesDirectory)/azure-devops/py-flask'
+        arguments: '--platform linux/amd64'  # 強制建置 AMD64 架構給 AKS 使用
         tags: |
           $(tag)
           latest

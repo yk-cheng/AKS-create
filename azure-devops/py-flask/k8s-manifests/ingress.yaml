@@ -6,12 +6,16 @@ metadata:
   labels:
     app: py-flask-app
   annotations:
-    # 使用 Azure CNI 的預設 Ingress Controller (nginx)
-    kubernetes.io/ingress.class: "nginx"
+    # 使用 nginx Ingress Controller
     nginx.ingress.kubernetes.io/rewrite-target: /
     # SSL 相關設定 (可選)
     # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    
+    # TODO: 升級為 AGIC (Application Gateway Ingress Controller)
+    # 未來替換為: appgw.ingress.kubernetes.io/* annotations
+    # 並移除 nginx 相關設定
 spec:
+  ingressClassName: "nginx"  # 使用現代化的 ingressClassName 而非廢棄的 annotation
   rules:
   - host: py-flask.local  # 本地測試用，生產環境請更換為實際域名
     http:

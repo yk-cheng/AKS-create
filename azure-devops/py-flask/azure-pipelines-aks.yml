@@ -32,7 +32,7 @@ stages:
       displayName: 'Build Docker Image'
       inputs:
         command: 'build'
-        repository: '$(imageRepository)'
+        repository: '$(containerRegistry)/$(imageRepository)'
         dockerfile: '$(dockerfilePath)'
         buildContext: '$(Build.SourcesDirectory)/azure-devops/py-flask'
         tags: |
@@ -43,7 +43,7 @@ stages:
       displayName: 'Push to Azure Container Registry'
       inputs:
         command: 'push'
-        repository: '$(imageRepository)'
+        repository: '$(containerRegistry)/$(imageRepository)'
         containerRegistry: 'acrdev9vgrsdq8'
         tags: |
           $(tag)

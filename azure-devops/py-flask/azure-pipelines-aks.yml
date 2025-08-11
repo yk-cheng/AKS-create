@@ -46,18 +46,27 @@ stages:
         command: 'login'
         containerRegistry: 'acrdev9vgrsdq8'
 
-    # 設定 buildx 並建置跨平台映像
+    # 使用跨平台建置 - 透過 Docker 環境變數強制 AMD64
     - script: |
-        docker buildx create --use --name multiarch --driver docker-container
-        docker buildx inspect --bootstrap
-        docker buildx build \
-          --platform linux/amd64 \
+        export DOCKER_DEFAULT_PLATFORM=linux/amd64
+        docker build \
           --tag $(containerRegistry)/$(imageRepository):$(tag) \
           --tag $(containerRegistry)/$(imageRepository):latest \
-          --push \
           -f $(dockerfilePath) \
           $(Build.SourcesDirectory)/azure-devops/py-flask
-      displayName: 'Build and Push Multi-platform Docker Image (AMD64)'
+      displayName: 'Build Docker Image for AMD64 platform'
+      env:
+        DOCKER_DEFAULT_PLATFORM: linux/amd64
+
+    - task: Docker@2
+      displayName: 'Push to Azure Container Registry'
+      inputs:
+        command: 'push'
+        repository: '$(imageRepository)'
+        containerRegistry: 'acrdev9vgrsdq8'
+        tags: |
+          $(tag)
+          latest
 
 - stage: Deploy
   displayName: 'Deploy to AKS'

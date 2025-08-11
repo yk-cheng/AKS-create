@@ -39,28 +39,25 @@ stages:
     pool:
       name: $(poolName)
     steps:
+    # ACR 登入
     - task: Docker@2
-      displayName: 'Build Multi-platform Docker Image (AMD64)'
+      displayName: 'Login to Azure Container Registry'
       inputs:
-        command: 'build'
-        repository: '$(imageRepository)'
+        command: 'login'
         containerRegistry: 'acrdev9vgrsdq8'
-        dockerfile: '$(dockerfilePath)'
-        buildContext: '$(Build.SourcesDirectory)/azure-devops/py-flask'
-        arguments: '--platform linux/amd64'  # 強制建置 AMD64 架構給 AKS 使用
-        tags: |
-          $(tag)
-          latest
 
-    - task: Docker@2
-      displayName: 'Push to Azure Container Registry'
-      inputs:
-        command: 'push'
-        repository: '$(imageRepository)'
-        containerRegistry: 'acrdev9vgrsdq8'
-        tags: |
-          $(tag)
-          latest
+    # 設定 buildx 並建置跨平台映像
+    - script: |
+        docker buildx create --use --name multiarch --driver docker-container
+        docker buildx inspect --bootstrap
+        docker buildx build \
+          --platform linux/amd64 \
+          --tag $(containerRegistry)/$(imageRepository):$(tag) \
+          --tag $(containerRegistry)/$(imageRepository):latest \
+          --push \
+          -f $(dockerfilePath) \
+          $(Build.SourcesDirectory)/azure-devops/py-flask
+      displayName: 'Build and Push Multi-platform Docker Image (AMD64)'
 
 - stage: Deploy
   displayName: 'Deploy to AKS'

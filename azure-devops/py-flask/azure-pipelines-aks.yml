@@ -1,8 +1,19 @@
 # Azure DevOps Pipeline for Flask Application to AKS
 # Build Docker image, push to ACR, and deploy to AKS
 
+# CI 觸發條件 - 只有相關檔案變更時才觸發
 trigger:
-- main
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - azure-devops/py-flask/**  # 只有 Flask 應用相關檔案
+    exclude:
+    - docs/**                   # 排除文檔變更
+    - '*.md'                    # 排除 Markdown 檔案
+    - terraform/**              # 排除基礎設施變更 (除非需要)
+    - tmp/**                    # 排除臨時檔案
 
 variables:
   # Container Registry 設定
@@ -95,9 +106,19 @@ stages:
               arguments: 'pods,svc,ingress'
               outputFormat: 'wide'
 
-# Pull Request 觸發設定
+# Pull Request 觸發設定 - 同樣只針對相關檔案
 pr:
-- main
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - azure-devops/py-flask/**  # 只有 Flask 應用相關檔案
+    exclude:
+    - docs/**                   # 排除文檔變更
+    - '*.md'                    # 排除 Markdown 檔案
+    - terraform/**              # 排除基礎設施變更
+    - tmp/**                    # 排除臨時檔案
 
 # 排程建置 (可選)
 schedules:

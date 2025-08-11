@@ -1,8 +1,8 @@
 # DS-AKS 專案文檔索引
 
 **專案**: DS-AKS (地端 Kubernetes 遷移至 Azure AKS)  
-**更新日期**: 2025-08-07  
-**狀態**: DEV 環境已完成部署  
+**更新日期**: 2025-08-11  
+**狀態**: ✅ Flask CI/CD Pipeline 完成部署  
 
 ## 📚 文檔結構
 
@@ -13,6 +13,10 @@ docs/
 ├── dev-environment-status-report.md    # DEV 環境狀態報告  
 ├── terraform-architecture-guide.md     # Terraform 架構設計指南
 ├── acr-agic-integration-20250807.md    # ACR 和 AGIC 模組整合記錄
+├── flask-aks-deployment-complete.md    # ✅ Flask CI/CD Pipeline 完整記錄
+├── azure-devops-service-connections-guide.md  # Azure DevOps Service Connections 指南
+├── agic-upgrade-plan.md                # AGIC 升級計畫
+├── pipeline-trigger-strategy.md        # Pipeline 觸發策略
 ├── session-continuity-guide.md         # Session 接續指南
 └── runbooks/                           # 操作手冊目錄
 ```
@@ -75,6 +79,34 @@ docs/
 **適用對象**: DevOps 工程師、容器平台管理員  
 **使用場景**: ACR/AGIC 部署、問題排查、安全配置參考
 
+### 🎉 [Flask CI/CD Pipeline 完整記錄](flask-aks-deployment-complete.md) ✅ **最新完成**
+**檔案**: `flask-aks-deployment-complete.md`  
+**用途**: Python Flask 應用程式完整 CI/CD Pipeline 建置記錄  
+**內容**:
+- 完整的 GitHub → Azure DevOps → AKS 自動化部署流程
+- Service Connections 配置和 Service Principal 設定  
+- Self-hosted Agent 設定和跨平台建置問題解決
+- Docker 架構不匹配修復 (ARM64 vs AMD64)
+- Pipeline 觸發優化和效能改善
+- 23 個完整的任務清單和解決方案記錄
+- 未來 AGIC 升級和改進計畫
+
+**適用對象**: DevOps 工程師、CI/CD 團隊、應用開發團隊  
+**使用場景**: CI/CD Pipeline 建置、跨平台部署、問題排解參考
+
+### 📚 [Azure DevOps Service Connections 指南](azure-devops-service-connections-guide.md)
+**檔案**: `azure-devops-service-connections-guide.md`  
+**用途**: 詳細的 Service Connections 建立和配置指南  
+**內容**:
+- Service Principal 建立和權限分配
+- ACR, Azure RM, AKS Service Connections 配置
+- Federated Identity Credentials 設定
+- 常見問題排解和最佳實踐
+- CLI vs Web 界面建立方法比較
+
+**適用對象**: DevOps 工程師、Azure 管理員  
+**使用場景**: Service Connection 設定、認證問題解決
+
 ### 🔄 [Session 接續指南](session-continuity-guide.md)
 **檔案**: `session-continuity-guide.md`  
 **用途**: 跨 Session 工作接續和快速恢復指南  
@@ -113,22 +145,28 @@ docs/
 
 ## 🎯 專案狀態概覽
 
-### ✅ 已完成
+### ✅ 已完成 (2025-08-11)
 - **AKS 叢集部署**: Kubernetes 1.33.2 + Azure CNI + Calico
 - **ACR 整合**: Azure Container Registry + SystemAssigned Identity
 - **模組化架構**: AKS、ACR、AGIC、Networking 模組
 - **DEV 環境**: 完整功能驗證包含 ACR
-- **文檔體系**: 完整的記錄和指南
+- **🎉 Flask CI/CD Pipeline**: GitHub → Azure DevOps → AKS 完整自動化部署
+- **Service Connections**: ACR, Azure RM, AKS 連接配置完成
+- **跨平台建置**: ARM64 → AMD64 架構問題完全解決
+- **Pipeline 優化**: 智慧觸發，減少 60-80% 不必要執行
+- **文檔體系**: 完整的記錄和指南 (10+ 技術文件)
 
 ### 🔄 進行中
-- **應用程式部署測試**: 準備開始
-- **監控整合**: 規劃階段
-- **CI/CD 流程**: 設計階段
+- **AGIC 升級**: 從 nginx Ingress 升級到 Application Gateway Ingress Controller
+- **監控整合**: Azure Monitor 和 Application Insights 規劃
+- **Multi-environment**: Dev/Staging/Prod 環境設定
 
 ### 📋 計劃中
-- **Staging/Prod 環境**: 後續階段
-- **53 個服務遷移**: 主要目標
-- **災難恢復**: 安全考量
+- **更多應用部署**: 基於 Flask Pipeline 模式擴展
+- **53 個服務遷移**: 主要目標 
+- **Helm Charts**: 進階 Kubernetes 應用管理
+- **GitOps**: ArgoCD 或 Flux 整合
+- **災難恢復**: 安全和備份策略
 
 ## 📞 文檔維護
 
@@ -165,6 +203,8 @@ docs/
 
 ---
 
-**最後更新**: 2025-08-07  
+**最後更新**: 2025-08-11  
 **維護者**: DevOps Team  
 **聯絡方式**: 專案 DevOps 團隊
+
+> 🎉 **重大里程碑**: Flask CI/CD Pipeline 成功完成！實現了從 GitHub 到 AKS 的完全自動化部署流程。

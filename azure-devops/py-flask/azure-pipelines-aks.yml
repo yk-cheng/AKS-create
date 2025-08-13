@@ -127,11 +127,11 @@ pr:
     - terraform/**              # 排除基礎設施變更
     - tmp/**                    # 排除臨時檔案
 
-# 排程建置 (可選)
-schedules:
-- cron: "0 2 * * *"  # 每天凌晨 2 點建置
-  displayName: Daily build
-  branches:
-    include:
-    - main
-  always: false
+# 排程建置 (已停用)
+# schedules:
+# - cron: "0 2 * * *"  # 每天凌晨 2 點建置
+#   displayName: Daily build
+#   branches:
+#     include:
+#     - main
+#   always: false

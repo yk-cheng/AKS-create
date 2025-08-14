@@ -1,0 +1,75 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: py-flask-agic-ingress
+  namespace: py-flask-app
+  labels:
+    app: py-flask-app
+    ingress: agic
+  annotations:
+    # AGIC 特定註解
+    kubernetes.io/ingress.class: azure/application-gateway
+    appgw.ingress.kubernetes.io/ssl-redirect: "false"
+    appgw.ingress.kubernetes.io/connection-draining: "true"
+    appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
+    appgw.ingress.kubernetes.io/cookie-based-affinity: "false"
+    appgw.ingress.kubernetes.io/request-timeout: "30"
+    appgw.ingress.kubernetes.io/use-private-ip: "false"
+    
+    # 健康檢查設定
+    appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399"
+    appgw.ingress.kubernetes.io/health-probe-path: "/health"
+    appgw.ingress.kubernetes.io/health-probe-interval: "30"
+    appgw.ingress.kubernetes.io/health-probe-timeout: "5"
+    appgw.ingress.kubernetes.io/health-probe-unhealthy-threshold: "3"
+
+spec:
+  rules:
+  - host: py-flask.example.com  # 替換為您的域名
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: py-flask-service  # 連接到 ClusterIP Service
+            port:
+              number: 80
+  
+  # SSL/TLS 設定 (如果需要 HTTPS)
+  # tls:
+  # - hosts:
+  #   - py-flask.example.com
+  #   secretName: py-flask-tls-secret
+
+---
+# 替代方案：使用 IP-based access (不需要域名)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: py-flask-agic-ip-ingress
+  namespace: py-flask-app
+  labels:
+    app: py-flask-app
+    ingress: agic-ip
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+    appgw.ingress.kubernetes.io/ssl-redirect: "false"
+    appgw.ingress.kubernetes.io/health-probe-path: "/health"
+    appgw.ingress.kubernetes.io/health-probe-port: "8087"
+    appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399"
+    appgw.ingress.kubernetes.io/health-probe-interval: "30"
+    appgw.ingress.kubernetes.io/health-probe-timeout: "5"
+    appgw.ingress.kubernetes.io/health-probe-unhealthy-threshold: "3"
+    appgw.ingress.kubernetes.io/backend-path-prefix: "/"
+spec:
+  rules:
+  - http:  # 沒有指定 host，通過 Application Gateway 的 IP 直接存取
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: py-flask-service
+            port:
+              number: 80

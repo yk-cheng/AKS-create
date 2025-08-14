@@ -165,6 +165,113 @@ variable "application_gateway_id" {
   default     = ""
 }
 
+# Application Gateway Configuration
+variable "application_gateway_name" {
+  description = "Application Gateway name"
+  type        = string
+  default     = ""
+}
+
+variable "agw_subnet_name" {
+  description = "Application Gateway subnet name"
+  type        = string
+  default     = ""
+}
+
+variable "agw_subnet_address_prefixes" {
+  description = "Application Gateway subnet address prefixes"
+  type        = list(string)
+  default     = ["10.0.2.0/24"]
+}
+
+variable "agw_sku_name" {
+  description = "Application Gateway SKU name"
+  type        = string
+  default     = "Standard_v2"
+}
+
+variable "agw_sku_tier" {
+  description = "Application Gateway SKU tier"
+  type        = string
+  default     = "Standard_v2"
+}
+
+variable "agw_capacity" {
+  description = "Application Gateway capacity (if not using autoscale)"
+  type        = number
+  default     = 2
+}
+
+variable "availability_zones" {
+  description = "Availability zones for resources"
+  type        = list(string)
+  default     = ["1", "2", "3"]
+}
+
+variable "enable_agw_waf" {
+  description = "Enable WAF for Application Gateway"
+  type        = bool
+  default     = false
+}
+
+variable "enable_agw_autoscale" {
+  description = "Enable autoscale for Application Gateway"
+  type        = bool
+  default     = true
+}
+
+variable "agw_min_capacity" {
+  description = "Minimum capacity for autoscaling"
+  type        = number
+  default     = 1
+}
+
+variable "agw_max_capacity" {
+  description = "Maximum capacity for autoscaling"
+  type        = number
+  default     = 10
+}
+
+variable "agw_waf_mode" {
+  description = "WAF mode (Detection or Prevention)"
+  type        = string
+  default     = "Detection"
+}
+
+variable "agw_waf_rule_set_version" {
+  description = "WAF rule set version"
+  type        = string
+  default     = "3.2"
+}
+
+variable "agw_waf_file_upload_limit_mb" {
+  description = "WAF file upload limit in MB"
+  type        = number
+  default     = 100
+}
+
+variable "agw_waf_request_body_check" {
+  description = "WAF request body check"
+  type        = bool
+  default     = true
+}
+
+variable "agw_waf_max_request_body_size_kb" {
+  description = "WAF maximum request body size in KB"
+  type        = number
+  default     = 128
+}
+
+variable "agw_ssl_certificates" {
+  description = "SSL certificates for Application Gateway"
+  type = list(object({
+    name     = string
+    data     = string
+    password = string
+  }))
+  default = []
+}
+
 variable "enable_log_analytics" {
   description = "Enable Log Analytics integration"
   type        = bool

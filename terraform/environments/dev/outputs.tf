@@ -62,3 +62,29 @@ output "subnet_id" {
   description = "AKS Subnet ID"
   value       = module.networking.subnet_id
 }
+
+output "agw_subnet_id" {
+  description = "Application Gateway Subnet ID"
+  value       = module.networking.agw_subnet_id
+}
+
+# Application Gateway Outputs
+output "application_gateway_id" {
+  description = "Application Gateway ID"
+  value       = var.enable_application_gateway ? module.application_gateway[0].application_gateway_id : null
+}
+
+output "application_gateway_name" {
+  description = "Application Gateway Name"
+  value       = var.enable_application_gateway ? module.application_gateway[0].application_gateway_name : null
+}
+
+output "application_gateway_public_ip" {
+  description = "Application Gateway Public IP"
+  value       = var.enable_application_gateway ? module.application_gateway[0].public_ip_address : null
+}
+
+output "application_gateway_fqdn" {
+  description = "Application Gateway FQDN"
+  value       = var.enable_application_gateway ? module.application_gateway[0].public_ip_fqdn : null
+}

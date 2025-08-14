@@ -21,7 +21,7 @@ resource "azurerm_application_gateway" "agw" {
   sku {
     name     = var.sku_name
     tier     = var.sku_tier
-    capacity = var.capacity
+    capacity = var.enable_autoscale ? null : var.capacity
   }
 
   zones = var.availability_zones
@@ -88,15 +88,15 @@ resource "azurerm_application_gateway" "agw" {
     }
   }
 
-  # SSL Configuration
-  dynamic "ssl_certificate" {
-    for_each = var.ssl_certificates
-    content {
-      name     = ssl_certificate.value.name
-      data     = ssl_certificate.value.data
-      password = ssl_certificate.value.password
-    }
-  }
+  # SSL Configuration (commented out for dev environment)
+  # dynamic "ssl_certificate" {
+  #   for_each = var.ssl_certificates
+  #   content {
+  #     name     = ssl_certificate.value.name
+  #     data     = ssl_certificate.value.data
+  #     password = ssl_certificate.value.password
+  #   }
+  # }
 
   # Autoscale configuration
   dynamic "autoscale_configuration" {
@@ -107,10 +107,11 @@ resource "azurerm_application_gateway" "agw" {
     }
   }
 
-  # Identity for AGIC
-  identity {
-    type = "SystemAssigned"
-  }
+  # Identity for AGIC (commented out - AGIC will be managed by AKS addon)
+  # identity {
+  #   type = "UserAssigned"  # Application Gateway only supports UserAssigned
+  #   identity_ids = [var.user_assigned_identity_id]
+  # }
 
   tags = var.tags
 

@@ -28,13 +28,13 @@ output "frontend_ip_configuration" {
 }
 
 output "identity_principal_id" {
-  description = "Principal ID of the Application Gateway managed identity"
-  value       = azurerm_application_gateway.agw.identity[0].principal_id
+  description = "Principal ID of the Application Gateway managed identity (not applicable when identity is disabled)"
+  value       = null
 }
 
 output "identity_tenant_id" {
-  description = "Tenant ID of the Application Gateway managed identity"
-  value       = azurerm_application_gateway.agw.identity[0].tenant_id
+  description = "Tenant ID of the Application Gateway managed identity (not applicable when identity is disabled)"
+  value       = null
 }
 
 # Diagnostic settings output

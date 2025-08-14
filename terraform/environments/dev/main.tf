@@ -47,6 +47,11 @@ module "networking" {
   subnet_name            = var.subnet_name != "" ? var.subnet_name : "subnet-aks-${var.environment}"
   subnet_address_prefixes = var.subnet_address_prefixes
   
+  # Application Gateway Subnet Configuration
+  enable_application_gateway_subnet = var.enable_application_gateway
+  agw_subnet_name                   = var.agw_subnet_name != "" ? var.agw_subnet_name : "subnet-agw-${var.environment}"
+  agw_subnet_address_prefixes       = var.agw_subnet_address_prefixes
+  
   location            = var.location
   resource_group_name = azurerm_resource_group.main.name
   tags               = var.tags
@@ -122,7 +127,7 @@ module "aks" {
 
   # Application Gateway
   enable_application_gateway = var.enable_application_gateway
-  application_gateway_id     = var.application_gateway_id
+  application_gateway_id     = var.enable_application_gateway ? module.application_gateway[0].application_gateway_id : ""
 
   # Monitoring
   enable_log_analytics       = var.enable_log_analytics
@@ -133,4 +138,52 @@ module "aks" {
 
   # Tags
   tags = var.tags
+}
+
+# Application Gateway Module (for AGIC)
+module "application_gateway" {
+  count  = var.enable_application_gateway ? 1 : 0
+  source = "../../modules/application-gateway"
+
+  # Basic Configuration
+  application_gateway_name = var.application_gateway_name != "" ? var.application_gateway_name : "agw-${var.environment}"
+  resource_group_name     = azurerm_resource_group.main.name
+  location               = var.location
+
+  # Network Configuration
+  subnet_id = module.networking.agw_subnet_id
+  
+  # SKU Configuration
+  sku_name  = var.agw_sku_name
+  sku_tier  = var.agw_sku_tier
+  capacity  = var.agw_capacity
+  
+  # Multi-zone deployment
+  availability_zones = var.availability_zones
+
+  # Features
+  enable_waf        = var.enable_agw_waf
+  enable_autoscale  = var.enable_agw_autoscale
+  min_capacity      = var.agw_min_capacity
+  max_capacity      = var.agw_max_capacity
+  
+  # WAF Configuration
+  waf_mode                     = var.agw_waf_mode
+  waf_rule_set_version        = var.agw_waf_rule_set_version
+  waf_file_upload_limit_mb    = var.agw_waf_file_upload_limit_mb
+  waf_request_body_check      = var.agw_waf_request_body_check
+  waf_max_request_body_size_kb = var.agw_waf_max_request_body_size_kb
+
+  # SSL Certificates
+  ssl_certificates = var.agw_ssl_certificates
+
+  # Monitoring
+  enable_diagnostics           = var.enable_log_analytics
+  log_analytics_workspace_id   = var.log_analytics_workspace_id
+
+  # Tags
+  tags = var.tags
+  
+  # Dependencies
+  depends_on = [module.networking]
 }

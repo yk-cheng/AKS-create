@@ -250,10 +250,38 @@ spec:
               number: 80
 ```
 
-### 5. AGIC Addon 啟用
+### 5. AGIC Addon 啟用方式
 
-AGIC addon 透過 Terraform 自動啟用：
+### 方式一：透過 Terraform (本專案使用的方式)
+AGIC addon 透過 Terraform 自動啟用，在 AKS 模組中配置：
+```hcl
+# terraform/modules/aks/main.tf
+dynamic "ingress_application_gateway" {
+  for_each = var.enable_application_gateway ? [1] : []
+  content {
+    gateway_id = var.application_gateway_id
+  }
+}
+```
 
+### 方式二：透過 Azure CLI
+```bash
+az aks enable-addons \
+  --resource-group rg-aks-dev \
+  --name aks-dev-cluster \
+  --addons ingress-appgw \
+  --appgw-id /subscriptions/{subscription-id}/resourceGroups/rg-aks-dev/providers/Microsoft.Network/applicationGateways/agw-aks-dev
+```
+
+### 方式三：透過 Azure Portal
+1. 進入 Azure Portal → Kubernetes 服務
+2. 選擇您的 AKS cluster (aks-dev-cluster)
+3. 左側選單：**設定** → **網路** → **虛擬網路整合**
+4. 在 "Application Gateway Ingress Controller" 區段點擊 **啟用**
+5. 選擇現有的 Application Gateway (agw-aks-dev)
+6. 點擊 **儲存** 完成設定
+
+### 驗證 AGIC Addon 狀態
 ```bash
 # 確認 AGIC addon 狀態
 az aks show --resource-group rg-aks-dev --name aks-dev-cluster \
